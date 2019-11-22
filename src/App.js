@@ -10,6 +10,7 @@ class App extends Component {
     super(props);
     this.state = {
         todos: []
+        
     };
 
     this.addTodo = this.addTodo.bind(this);
@@ -33,15 +34,21 @@ class App extends Component {
   addTodo(newTodo){
       // Parametre olarak inputtan yeni eklenen değeri "newTodo" olarak alıyoruz.
       // State'i mutate etmemek için rest operatörü ile bir kopyalama yapıp yeni todoyu concat ile ekliyoruz.
-      this.setState({
-        todos: [...this.state.todos].concat([
-            { content: newTodo, id: Math.random(), checked: false}
-        ])
-      }, () => {
-          // Todo ekrana eklendikten sonra bunu localstorage'a da ekliyoruz.
-        window.localStorage.setItem("todos", JSON.stringify(this.state.todos))
-      })
+    if(newTodo.trim() == '') {
+        alert('Lütfen bir şeyler yazınız')
+    }else {
+        this.setState({
+            todos: [...this.state.todos].concat([
+                { content: newTodo, id: Math.random(), checked: false}
+            ])
+        }, () => {
+            window.localStorage.setItem("todos", JSON.stringify(this.state.todos));
+        })
+    }
+   
+    
   }
+
 
   removeTodo(id){
       // Silinecek todo'nun idsini parametre olarak alıyoruz.
@@ -69,6 +76,7 @@ class App extends Component {
       // Map ile mevcut todolar arasında döngüye girip, değiştirmek istediğimi farklı şekilde dönüyorum.
       // Aradığım itemin checked statusunu değiştiriyorum, rest ile kopyalayarak yani mutate etmeden.
       // Diğer elemanları olduğu gibi dönüyorum, "return todo";
+      console.log(id)
       const newArr = this.state.todos.map((todo) => {
           if(id === todo.id){
               let currentTodo = {...todo};
@@ -78,6 +86,7 @@ class App extends Component {
               return todo;
           }
       });
+      
       this.setState({
           todos: newArr
       }, () => {
@@ -98,15 +107,18 @@ class App extends Component {
 
             <TodoList
                 title="Tamamlanmamış Todolar"
-                todos={[]}
+                todos={this.state.todos.filter(item => !item.checked)}
                 onTodoRemove={this.removeTodo}
                 onCheckedToggle={this.toggleCompleteStatus} />
 
             <TodoList
                 title="Tamamlanmış Todolar"
-                todos={[]}
+                todos={this.state.todos.filter(item => item.checked)}
                 onTodoRemove={this.removeTodo}
                 onCheckedToggle={this.toggleCompleteStatus} />
+
+               
+               
         </div>
     );
   }
